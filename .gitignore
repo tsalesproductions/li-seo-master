@@ -1,0 +1,40 @@
+# Arquivo de variáveis de ambiente com chaves e tokens sensíveis
+.env
+
+# Banco de dados local SQLite (gerado automaticamente via código)
+database.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Bytecode e cache do Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Ambientes virtuais
+venv/
+.venv/
+env/
+ENV/
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Planilhas, relatórios, backups e logs locais
+backups/
+output/
+*.xlsx
+*.csv
+*.log
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+

@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LI SEO & Copy Master - Dashboard de Alta Conversão</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Estilização para preview HTML da loja */
+    .store-preview h2 {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: #1e293b;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.25rem;
+    }
+
+    .store-preview p {
+      margin-bottom: 0.75rem;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    .store-preview ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+      color: #334155;
+    }
+
+    .store-preview li {
+      margin-bottom: 0.25rem;
+    }
+
+    .store-preview .keywords-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .store-preview .keywords-tags li a {
+      display: inline-block;
+      background-color: #f1f5f9;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      color: #0284c7;
+      text-decoration: none;
+      border: 1px solid #cbd5e1;
+    }
+
+    .store-preview .keywords-tags li a:hover {
+      background-color: #e2e8f0;
+    }
+
+    .store-preview img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.375rem;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <!-- Navbar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight">LI SEO & Copy Master</h1>
+          <p class="text-xs text-slate-500">Loja Integrada + GPT de Alta Conversão</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button onclick="clearAllProducts()"
+          class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1"></i>
+          Limpar Banco
+        </button>
+        <button onclick="openSettingsModal()"
+          class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+          <i data-lucide="settings" class="w-4 h-4 mr-1.5 text-slate-500"></i>
+          Configurar Loja
+        </button>
+        <button onclick="openSyncModal()"
+          class="inline-flex items-center px-3.5 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors">
+          <i data-lucide="refresh-cw" class="w-4 h-4 mr-1.5"></i>
+          Sincronizar da Loja
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- BANNER DE TAREFA EM SEGUNDO PLANO (AO VIVO) -->
+    <div id="activeTaskBanner" class="hidden bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-4 rounded-2xl shadow-lg border border-blue-500/30 transition-all duration-300">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center space-x-3.5">
+          <div id="taskSpinner" class="w-7 h-7 border-2 border-white/30 border-t-white rounded-full animate-spin flex-shrink-0"></div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span id="taskTypeBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/20 text-blue-100">SEGUNDO PLANO</span>
+              <h3 id="taskTitle" class="text-sm font-bold tracking-tight">Processando tarefa...</h3>
+            </div>
+            <p id="taskMessage" class="text-xs text-blue-100 mt-0.5 line-clamp-1 font-mono">Aguarde...</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4 self-end sm:self-auto">
+          <!-- Barra de Progresso e Percentual -->
+          <div class="flex flex-col items-end">
+            <span id="taskPercent" class="text-xs font-bold font-mono text-emerald-300">0%</span>
+            <div class="w-36 sm:w-52 bg-black/25 rounded-full h-2 overflow-hidden mt-1 p-0.5">
+              <div id="taskProgressBar" class="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+          <button type="button" onclick="cancelActiveTask()" class="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-white/10 hover:bg-rose-500/80 rounded-lg transition-colors border border-white/20 text-white">
+            <i data-lucide="square" class="w-3 h-3 mr-1"></i>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards de Métricas -->
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+      <div onclick="filterByQuick('TODOS', 'TODOS', 'TODOS')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-0.5">Total no Banco</div>
+        <div id="stat-total" class="text-2xl font-bold text-slate-800">--</div>
+      </div>
+      <div onclick="filterByQuick('TODOS', 'SEM_SEO', 'TODOS')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-rose-100 bg-rose-50/20 shadow-sm hover:border-rose-300 transition-colors">
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-rose-500 mb-0.5">Sem SEO na LI</div>
+        <div id="stat-sem-seo" class="text-2xl font-bold text-rose-600">--</div>
+      </div>
+      <div onclick="filterByQuick('GERADO', 'TODOS', 'TODOS')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-purple-100 bg-purple-50/20 shadow-sm hover:border-purple-300 transition-colors">
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-purple-600 mb-0.5">Gerados com IA</div>
+        <div id="stat-com-ia" class="text-2xl font-bold text-purple-600">--</div>
+      </div>
+      <div onclick="filterByQuick('TODOS', 'TODOS', 'PENDENTE')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-amber-100 bg-amber-50/20 shadow-sm hover:border-amber-300 transition-colors">
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-amber-500 mb-0.5">Pendentes</div>
+        <div id="stat-pendentes" class="text-2xl font-bold text-amber-600">--</div>
+      </div>
+      <div onclick="filterByQuick('TODOS', 'TODOS', 'APROVADO')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-emerald-100 bg-emerald-50/20 shadow-sm hover:border-emerald-300 transition-colors">
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-emerald-500 mb-0.5">Aprovados</div>
+        <div id="stat-aprovados" class="text-2xl font-bold text-emerald-600">--</div>
+      </div>
+      <div onclick="filterByQuick('TODOS', 'TODOS', 'PUBLICADO')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-blue-100 bg-blue-50/20 shadow-sm hover:border-blue-300 transition-colors">
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-blue-500 mb-0.5">Publicados</div>
+        <div id="stat-publicados" class="text-2xl font-bold text-blue-600">--</div>
+      </div>
+    </div>
+
+    <!-- Barra de Filtros e Ações em Lote -->
+    <div
+      class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <!-- Filtros Completos -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+          <input type="text" id="searchInput" oninput="debounceSearch()" placeholder="Buscar nome, SKU ou ID..."
+            class="pl-9 pr-4 py-1.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-56 bg-slate-50">
+        </div>
+
+        <!-- Filtro IA -->
+        <select id="aiFilter" onchange="resetAndLoad()"
+          class="py-1.5 px-2.5 text-xs font-medium rounded-lg border border-purple-200 bg-purple-50/40 text-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer">
+          <option value="TODOS">IA: Todas</option>
+          <option value="GERADO">✨ IA: Apenas Gerados</option>
+          <option value="NAO_GERADO">⏳ IA: Não Gerados (Falta Gerar)</option>
+        </select>
+
+        <!-- Filtro SEO Loja -->
+        <select id="seoFilter" onchange="resetAndLoad()"
+          class="py-1.5 px-2.5 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+          <option value="TODOS">SEO Loja: Todos</option>
+          <option value="SEM_SEO">❌ Sem SEO na Loja</option>
+          <option value="COM_SEO">✅ Com SEO na Loja</option>
+        </select>
+
+        <!-- Filtro Status Aprovação -->
+        <select id="statusFilter" onchange="resetAndLoad()"
+          class="py-1.5 px-2.5 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+          <option value="TODOS">Status: Todos</option>
+          <option value="PENDENTE">🟡 Pendentes</option>
+          <option value="APROVADO">🟢 Aprovados</option>
+          <option value="PUBLICADO">🔵 Publicados</option>
+          <option value="REJEITADO">⚪ Rejeitados</option>
+        </select>
+
+        <!-- Botão Resetar Filtros -->
+        <button type="button" onclick="resetAllFilters()" title="Resetar Filtros"
+          class="inline-flex items-center px-2 py-1.5 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1"></i>
+          Limpar
+        </button>
+      </div>
+
+      <!-- Ações em Lote -->
+      <div class="flex items-center space-x-2 flex-wrap">
+        <button onclick="triggerBatchGenerate()"
+          class="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors">
+          <i data-lucide="bot" class="w-4 h-4 mr-1.5 text-purple-600"></i>
+          Gerar com IA (Lote)
+        </button>
+        <button onclick="triggerBatchApprove()"
+          class="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors">
+          <i data-lucide="check-check" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+          Aprovar Todos
+        </button>
+        <button onclick="triggerBatchPublish()"
+          class="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors">
+          <i data-lucide="upload-cloud" class="w-4 h-4 mr-1.5"></i>
+          Publicar Aprovados
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabela / Lista de Produtos -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="loadingIndicator" class="hidden p-8 text-center text-slate-500">
+        <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-blue-600 mb-2"></i>
+        Carregando produtos...
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-xs uppercase text-slate-500 font-semibold border-b border-slate-200">
+            <tr>
+              <th class="px-6 py-3">Produto</th>
+              <th class="px-4 py-3">SKU</th>
+              <th class="px-4 py-3">SEO na Loja</th>
+              <th class="px-4 py-3">Status de Aprovação</th>
+              <th class="px-4 py-3">IA Sugestão</th>
+              <th class="px-6 py-3 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody" class="divide-y divide-slate-200">
+            <!-- Linhas geradas via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="hidden p-12 text-center">
+        <i data-lucide="package-open" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+        <h3 class="text-base font-semibold text-slate-700">Nenhum produto encontrado</h3>
+        <p class="text-sm text-slate-500 mt-1">Clique em "Sincronizar da Loja" para importar seus produtos da Loja
+          Integrada.</p>
+      </div>
+
+      <!-- Barra de Paginação -->
+      <div id="paginationBar" class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+        <div class="flex items-center space-x-2">
+          <span id="pageInfoText">Mostrando 0 a 0 de 0 produtos</span>
+          <span class="text-slate-300">|</span>
+          <label class="text-slate-500">Exibir:</label>
+          <select id="pageSizeSelect" onchange="changePageSize()" class="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs focus:ring-1 focus:ring-blue-500">
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-1.5">
+          <button id="btnFirstPage" onclick="goToPage(1)" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 rounded disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors">« Primeira</button>
+          <button id="btnPrevPage" onclick="prevPage()" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 rounded disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors">‹ Anterior</button>
+          <span id="pageNumberDisplay" class="px-3 py-1 font-semibold text-slate-700 bg-white border border-slate-200 rounded">1 / 1</span>
+          <button id="btnNextPage" onclick="nextPage()" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 rounded disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors">Próxima ›</button>
+          <button id="btnLastPage" onclick="goToLastPage()" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 rounded disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors">Última »</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DE REVISÃO E EDIÇÃO DO PRODUTO -->
+  <div id="editModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+
+      <!-- Topo Modal -->
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span id="modalSku" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-200 text-slate-700"></span>
+            <span id="modalId" class="text-xs text-slate-400"></span>
+          </div>
+          <h2 id="modalProductName" class="text-base font-bold text-slate-800 line-clamp-1 mt-1"></h2>
+        </div>
+        <button onclick="closeEditModal()"
+          class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Corpo do Modal -->
+      <div class="p-6 overflow-y-auto space-y-6 flex-1">
+        <input type="hidden" id="modalProductId">
+
+        <!-- Bloco SEO -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center">
+              <i data-lucide="search" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+              SEO On-Page (Meta Tags da Loja)
+            </h3>
+            <span class="text-xs text-slate-500">Google SERP</span>
+          </div>
+
+          <!-- SEO Title -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-semibold text-slate-600">SEO Title (Título da Página)</label>
+              <span id="titleCounter" class="text-xs text-slate-400 font-mono">0 / 60</span>
+            </div>
+            <input type="text" id="modalSeoTitle" oninput="updateCounters()"
+              class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+          </div>
+
+          <!-- SEO Description -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-semibold text-slate-600">Meta Description (Copy de Busca)</label>
+              <span id="descCounter" class="text-xs text-slate-400 font-mono">0 / 155</span>
+            </div>
+            <textarea id="modalSeoDesc" rows="2" oninput="updateCounters()"
+              class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"></textarea>
+          </div>
+
+          <!-- SEO Keywords -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Palavras-chave (Keywords)</label>
+            <input type="text" id="modalSeoKeywords"
+              class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+          </div>
+        </div>
+
+        <!-- Bloco Descrição Completa -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center">
+              <i data-lucide="file-text" class="w-4 h-4 mr-1.5 text-purple-600"></i>
+              Descrição Completa Enriquecida (HTML)
+            </h3>
+            <!-- Tabs Preview vs Código -->
+            <div class="flex bg-slate-100 p-0.5 rounded-lg text-xs font-medium">
+              <button type="button" id="tabPreviewBtn" onclick="switchDescTab('preview')"
+                class="px-3 py-1 rounded-md bg-white shadow-sm text-slate-800">Preview Visual</button>
+              <button type="button" id="tabCodeBtn" onclick="switchDescTab('code')"
+                class="px-3 py-1 rounded-md text-slate-500 hover:text-slate-700">Código HTML</button>
+            </div>
+          </div>
+
+          <!-- Visualização Preview -->
+          <div id="descPreviewContainer"
+            class="p-4 border border-slate-200 rounded-xl bg-white max-h-72 overflow-y-auto store-preview">
+            <div id="modalDescPreview"></div>
+          </div>
+
+          <!-- Editor HTML Code -->
+          <div id="descCodeContainer" class="hidden">
+            <textarea id="modalDescHtml" rows="10" oninput="syncPreviewFromCode()"
+              class="w-full text-xs font-mono p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-900 text-slate-100 leading-relaxed"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Rodapé do Modal -->
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="regenerateCurrentModal()"
+            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition-colors">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>
+            Regenerar IA
+          </button>
+          <button type="button" onclick="markCurrentModalStatus('REJEITADO')"
+            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 rounded-lg transition-colors">
+            <i data-lucide="x" class="w-3.5 h-3.5 mr-1"></i>
+            Rejeitar
+          </button>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="saveCurrentModal(false)"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg transition-colors">
+            <i data-lucide="save" class="w-4 h-4 mr-1.5 text-slate-500"></i>
+            Salvar
+          </button>
+          <button type="button" onclick="markCurrentModalStatus('APROVADO')"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors">
+            <i data-lucide="check" class="w-4 h-4 mr-1.5"></i>
+            Aprovar
+          </button>
+          <button type="button" onclick="publishCurrentModalDirect()"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors">
+            <i data-lucide="upload-cloud" class="w-4 h-4 mr-1.5"></i>
+            Publicar na LI
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIGURAÇÕES -->
+  <div id="settingsModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h3 class="text-base font-bold text-slate-800">Configurações da Loja & IA</h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"
+            class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nome da Loja (usado no final do Title e
+            Copy)</label>
+          <input type="text" id="settingStoreName"
+            class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">URL da Loja (usada para as Tags de
+            Busca)</label>
+          <input type="text" id="settingStoreUrl" placeholder="https://www.sualoja.com.br"
+            class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Modelo da OpenAI</label>
+          <select id="settingOpenaiModel"
+            class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="gpt-4o-mini">gpt-4o-mini (Recomendado - Rápido e Econômico)</option>
+            <option value="gpt-4o">gpt-4o (Máxima Criatividade)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
+        <button onclick="closeSettingsModal()"
+          class="px-3.5 py-1.5 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+        <button onclick="saveSettings()"
+          class="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE SINCRONIZAÇÃO -->
+  <div id="syncModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h3 class="text-base font-bold text-slate-800">Sincronizar Loja Integrada</h3>
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"
+            class="w-5 h-5"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-500">Importa produtos da sua Loja Integrada para o banco local SQLite em segundo plano sem travar a tela.</p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Quantidade de Produtos para Buscar</label>
+          <select id="syncLimit"
+            class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            <option value="20" selected>20 produtos</option>
+            <option value="50">50 produtos</option>
+            <option value="100">100 produtos</option>
+            <option value="500">500 produtos</option>
+            <option value="0">Todos os produtos da loja</option>
+          </select>
+        </div>
+
+        <div class="flex items-start space-x-2 pt-1">
+          <input type="checkbox" id="syncOnlyAvailable" checked class="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
+          <label for="syncOnlyAvailable" class="text-xs text-slate-700 font-medium cursor-pointer leading-tight">
+            Apenas produtos disponíveis
+            <span class="block text-[11px] text-slate-400 font-normal">Descarta automaticamente desativados e sem estoque</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
+        <button onclick="closeSyncModal()"
+          class="px-3.5 py-1.5 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+        <button onclick="executeSync()" id="btnExecuteSync"
+          class="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm flex items-center">
+          <i data-lucide="refresh-cw" class="w-4 h-4 mr-1.5"></i>
+          Iniciar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast"
+    class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2 text-sm">
+    <span id="toastIcon"></span>
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- Scripts do Frontend -->
+  <script>
+    let searchTimeout = null;
+    let currentProduct = null;
+    let currentPage = 1;
+    let currentPageSize = 50;
+    let totalPages = 1;
+    let totalProducts = 0;
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toastMsg');
+      const iconEl = document.getElementById('toastIcon');
+      msgEl.innerText = msg;
+      iconEl.innerHTML = type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️');
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    async function clearAllProducts() {
+      if (!confirm('Tem certeza que deseja apagar todos os produtos do painel local? Essa ação não pode ser desfeita.')) return;
+      try {
+        const res = await fetch('/api/clear', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          showToast('Banco local limpo com sucesso!');
+          loadStats();
+          resetAndLoad();
+        }
+      } catch (e) {
+        showToast('Erro ao limpar banco', 'error');
+      }
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        document.getElementById('stat-total').innerText = data.total ?? '--';
+        document.getElementById('stat-sem-seo').innerText = data.sem_seo ?? '--';
+        document.getElementById('stat-com-ia').innerText = data.com_ia ?? '--';
+        document.getElementById('stat-pendentes').innerText = data.pendentes ?? '--';
+        document.getElementById('stat-aprovados').innerText = data.aprovados ?? '--';
+        document.getElementById('stat-publicados').innerText = data.publicados ?? '--';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function resetAndLoad() {
+      currentPage = 1;
+      loadProducts();
+    }
+
+    function resetAllFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('aiFilter').value = 'TODOS';
+      document.getElementById('seoFilter').value = 'TODOS';
+      document.getElementById('statusFilter').value = 'TODOS';
+      currentPage = 1;
+      loadProducts();
+    }
+
+    function filterByQuick(ai, seo, status) {
+      document.getElementById('aiFilter').value = ai;
+      document.getElementById('seoFilter').value = seo;
+      document.getElementById('statusFilter').value = status;
+      currentPage = 1;
+      loadProducts();
+    }
+
+    function goToPage(p) {
+      if (p < 1 || p > totalPages) return;
+      currentPage = p;
+      loadProducts();
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        loadProducts();
+      }
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages) {
+        currentPage++;
+        loadProducts();
+      }
+    }
+
+    function goToLastPage() {
+      goToPage(totalPages);
+    }
+
+    function changePageSize() {
+      currentPageSize = parseInt(document.getElementById('pageSizeSelect').value) || 50;
+      currentPage = 1;
+      loadProducts();
+    }
+
+    async function loadProducts() {
+      const status = document.getElementById('statusFilter').value;
+      const aiStatus = document.getElementById('aiFilter').value;
+      const seoStatus = document.getElementById('seoFilter').value;
+      const search = document.getElementById('searchInput').value;
+      const tbody = document.getElementById('productsTableBody');
+      const emptyState = document.getElementById('emptyState');
+      const loader = document.getElementById('loadingIndicator');
+
+      loader.classList.remove('hidden');
+      tbody.innerHTML = '';
+      emptyState.classList.add('hidden');
+
+      try {
+        const url = `/api/products?status=${encodeURIComponent(status)}&ai_status=${encodeURIComponent(aiStatus)}&seo_status=${encodeURIComponent(seoStatus)}&search=${encodeURIComponent(search)}&page=${currentPage}&limit=${currentPageSize}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        loader.classList.add('hidden');
+
+        const products = Array.isArray(data) ? data : (data.products || []);
+        totalProducts = data.total !== undefined ? data.total : products.length;
+        totalPages = data.pages !== undefined ? Math.max(1, data.pages) : 1;
+        currentPage = data.page !== undefined ? data.page : 1;
+
+        // Atualiza paginação
+        const startItem = totalProducts === 0 ? 0 : (currentPage - 1) * currentPageSize + 1;
+        const endItem = Math.min(currentPage * currentPageSize, totalProducts);
+        document.getElementById('pageInfoText').innerText = `Mostrando ${startItem}–${endItem} de ${totalProducts} produtos`;
+        document.getElementById('pageNumberDisplay').innerText = `${currentPage} / ${totalPages}`;
+
+        document.getElementById('btnFirstPage').disabled = currentPage <= 1;
+        document.getElementById('btnPrevPage').disabled = currentPage <= 1;
+        document.getElementById('btnNextPage').disabled = currentPage >= totalPages;
+        document.getElementById('btnLastPage').disabled = currentPage >= totalPages;
+
+        if (!products || products.length === 0) {
+          emptyState.classList.remove('hidden');
+          return;
+        }
+
+        products.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 transition-colors';
+
+          const hasSeoBadge = p.has_seo
+            ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">✅ Preenchido</span>`
+            : `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-800">❌ Ausente</span>`;
+
+          let statusBadge = '';
+          if (p.status_aprovacao === 'APROVADO') {
+            statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Aprovado</span>`;
+          } else if (p.status_aprovacao === 'PUBLICADO') {
+            statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Publicado</span>`;
+          } else if (p.status_aprovacao === 'REJEITADO') {
+            statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Rejeitado</span>`;
+          } else {
+            statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Pendente</span>`;
+          }
+
+          const hasAi = p.seo_title_sugerido || p.descricao_sugerida_html;
+          const aiBadge = hasAi
+            ? `<span class="text-xs text-purple-600 font-semibold flex items-center"><i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>Gerado</span>`
+            : `<span class="text-xs text-slate-400">Não gerado</span>`;
+
+          tr.innerHTML = `
+            <td class="px-6 py-4">
+              <div class="flex items-center space-x-3">
+                ${p.imagem_url ? `<img src="${p.imagem_url}" class="w-10 h-10 object-cover rounded-lg border border-slate-200">` : `<div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 text-xs">Sem foto</div>`}
+                <div class="max-w-md">
+                  <div class="font-medium text-slate-900 line-clamp-1">${p.nome}</div>
+                  <div class="text-xs text-slate-400">ID: ${p.id} ${p.preco ? '• R$ ' + p.preco : ''}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4 text-xs font-mono text-slate-600">${p.sku || '-'}</td>
+            <td class="px-4 py-4">${hasSeoBadge}</td>
+            <td class="px-4 py-4">${statusBadge}</td>
+            <td class="px-4 py-4">${aiBadge}</td>
+            <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+              <button onclick="openEditModal(${p.id})" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5 mr-1"></i>Revisar
+              </button>
+              <button onclick="quickGenerate(${p.id})" title="Gerar com IA" class="inline-flex items-center p-1.5 text-xs text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        lucide.createIcons();
+      } catch (err) {
+        loader.classList.add('hidden');
+        showToast('Erro ao carregar produtos', 'error');
+      }
+    }
+
+    function debounceSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentPage = 1;
+        loadProducts();
+      }, 350);
+    }
+
+    async function openEditModal(productId) {
+      try {
+        const res = await fetch(`/api/products/${productId}`);
+        const p = await res.json();
+        currentProduct = p;
+
+        document.getElementById('modalProductId').value = p.id;
+        document.getElementById('modalSku').innerText = p.sku ? `SKU: ${p.sku}` : 'SEM SKU';
+        document.getElementById('modalId').innerText = `#${p.id}`;
+        document.getElementById('modalProductName').innerText = p.nome;
+
+        document.getElementById('modalSeoTitle').value = p.seo_title_sugerido || p.seo_title_atual || '';
+        document.getElementById('modalSeoDesc').value = p.seo_desc_sugerido || p.seo_desc_atual || '';
+        document.getElementById('modalSeoKeywords').value = p.seo_keywords_sugerido || p.seo_keywords_atual || '';
+
+        const descHtml = p.descricao_sugerida_html || p.descricao_atual || '';
+        document.getElementById('modalDescHtml').value = descHtml;
+        document.getElementById('modalDescPreview').innerHTML = descHtml || '<p class="text-slate-400 italic">Sem descrição disponível.</p>';
+
+        updateCounters();
+        switchDescTab('preview');
+        document.getElementById('editModal').classList.remove('hidden');
+        lucide.createIcons();
+      } catch (e) {
+        showToast('Erro ao abrir produto', 'error');
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    function updateCounters() {
+      const titleLen = document.getElementById('modalSeoTitle').value.length;
+      const descLen = document.getElementById('modalSeoDesc').value.length;
+
+      const tEl = document.getElementById('titleCounter');
+      tEl.innerText = `${titleLen} / 60`;
+      tEl.className = titleLen > 65 ? 'text-xs text-rose-500 font-mono font-bold' : 'text-xs text-slate-400 font-mono';
+
+      const dEl = document.getElementById('descCounter');
+      dEl.innerText = `${descLen} / 155`;
+      dEl.className = descLen > 165 ? 'text-xs text-rose-500 font-mono font-bold' : 'text-xs text-slate-400 font-mono';
+    }
+
+    function switchDescTab(tab) {
+      const prevBtn = document.getElementById('tabPreviewBtn');
+      const codeBtn = document.getElementById('tabCodeBtn');
+      const prevCont = document.getElementById('descPreviewContainer');
+      const codeCont = document.getElementById('descCodeContainer');
+
+      if (tab === 'preview') {
+        prevBtn.className = 'px-3 py-1 rounded-md bg-white shadow-sm text-slate-800';
+        codeBtn.className = 'px-3 py-1 rounded-md text-slate-500 hover:text-slate-700';
+        prevCont.classList.remove('hidden');
+        codeCont.classList.add('hidden');
+        syncPreviewFromCode();
+      } else {
+        codeBtn.className = 'px-3 py-1 rounded-md bg-white shadow-sm text-slate-800';
+        prevBtn.className = 'px-3 py-1 rounded-md text-slate-500 hover:text-slate-700';
+        codeCont.classList.remove('hidden');
+        prevCont.classList.add('hidden');
+      }
+    }
+
+    function syncPreviewFromCode() {
+      const code = document.getElementById('modalDescHtml').value;
+      document.getElementById('modalDescPreview').innerHTML = code || '<p class="text-slate-400 italic">Sem descrição.</p>';
+    }
+
+    async function saveCurrentModal(close = false, customStatus = null) {
+      const id = document.getElementById('modalProductId').value;
+      const payload = {
+        seo_title_sugerido: document.getElementById('modalSeoTitle').value,
+        seo_desc_sugerido: document.getElementById('modalSeoDesc').value,
+        seo_keywords_sugerido: document.getElementById('modalSeoKeywords').value,
+        descricao_sugerida_html: document.getElementById('modalDescHtml').value,
+        status_aprovacao: customStatus || (currentProduct ? currentProduct.status_aprovacao : 'APROVADO')
+      };
+
+      try {
+        const res = await fetch(`/api/products/${id}/save`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast('Alterações salvas com sucesso!');
+          loadStats();
+          loadProducts();
+          if (close) closeEditModal();
+        } else {
+          showToast('Erro ao salvar: ' + (data.error || ''), 'error');
+        }
+      } catch (e) {
+        showToast('Erro de conexão ao salvar', 'error');
+      }
+    }
+
+    async function markCurrentModalStatus(status) {
+      await saveCurrentModal(true, status);
+    }
+
+    async function quickGenerate(productId) {
+      showToast('Gerando com IA...', 'info');
+      try {
+        const res = await fetch(`/api/products/${productId}/generate`, { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          showToast('SEO e Copy gerados!');
+          loadStats();
+          loadProducts();
+        } else {
+          showToast('Erro na geração: ' + (data.error || ''), 'error');
+        }
+      } catch (e) {
+        showToast('Falha ao comunicar com IA', 'error');
+      }
+    }
+
+    async function regenerateCurrentModal() {
+      const id = document.getElementById('modalProductId').value;
+      showToast('Regenerando com IA...', 'info');
+      try {
+        const res = await fetch(`/api/products/${id}/generate`, { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          openEditModal(id);
+          showToast('Regenerado com sucesso!');
+        } else {
+          showToast('Erro ao regenerar: ' + data.error, 'error');
+        }
+      } catch (e) {
+        showToast('Falha na regeneração', 'error');
+      }
+    }
+
+    async function publishCurrentModalDirect() {
+      const id = document.getElementById('modalProductId').value;
+      await saveCurrentModal(false, 'APROVADO');
+      showToast('Publicando na Loja Integrada...', 'info');
+
+      try {
+        const res = await fetch(`/api/products/${id}/publish`, { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          showToast('🚀 Publicado com sucesso na Loja Integrada!');
+          closeEditModal();
+          loadStats();
+          loadProducts();
+        } else {
+          showToast('Erro ao publicar: ' + data.error, 'error');
+        }
+      } catch (e) {
+        showToast('Erro ao enviar para a LI', 'error');
+      }
+    }
+
+    // ---------------------------------------------------------
+    // CONTROLE DE TAREFAS EM SEGUNDO PLANO (POLLING & FEEDBACK AO VIVO)
+    // ---------------------------------------------------------
+    let taskPollInterval = null;
+    let lastTaskRunning = false;
+
+    async function checkTaskStatus() {
+      try {
+        const res = await fetch('/api/task-status');
+        const task = await res.json();
+
+        const banner = document.getElementById('activeTaskBanner');
+        const spinner = document.getElementById('taskSpinner');
+        const titleEl = document.getElementById('taskTitle');
+        const badgeEl = document.getElementById('taskTypeBadge');
+        const msgEl = document.getElementById('taskMessage');
+        const percentEl = document.getElementById('taskPercent');
+        const barEl = document.getElementById('taskProgressBar');
+
+        if (task.is_running) {
+          banner.classList.remove('hidden');
+          spinner.classList.remove('hidden');
+          badgeEl.innerText = (task.type || 'TAREFA').toUpperCase();
+          titleEl.innerText = task.title || 'Processando em segundo plano...';
+          msgEl.innerText = task.message || 'Processando...';
+          percentEl.innerText = `${task.percent || 0}%`;
+          barEl.style.width = `${task.percent || 0}%`;
+          lastTaskRunning = true;
+
+          // Se não estiver com polling ativo, liga
+          if (!taskPollInterval) {
+            taskPollInterval = setInterval(checkTaskStatus, 1200);
+          }
+        } else {
+          // Se estava rodando e agora acabou
+          if (lastTaskRunning) {
+            lastTaskRunning = false;
+            if (taskPollInterval) {
+              clearInterval(taskPollInterval);
+              taskPollInterval = null;
+            }
+
+            // Exibe mensagem de finalização
+            spinner.classList.add('hidden');
+            percentEl.innerText = '100%';
+            barEl.style.width = '100%';
+            msgEl.innerText = task.message || 'Concluído com sucesso!';
+            showToast(task.message || 'Tarefa concluída com sucesso!');
+
+            // Atualiza estatísticas e tabela sem precisar de refresh do usuário
+            loadStats();
+            loadProducts();
+
+            // Esconde o banner após 5 segundos
+            setTimeout(() => {
+              banner.classList.add('hidden');
+            }, 5000);
+          } else {
+            banner.classList.add('hidden');
+          }
+        }
+      } catch (e) {
+        console.warn('Erro ao checar status da tarefa:', e);
+      }
+    }
+
+    function startTaskPolling() {
+      if (taskPollInterval) clearInterval(taskPollInterval);
+      checkTaskStatus();
+      taskPollInterval = setInterval(checkTaskStatus, 1200);
+    }
+
+    async function cancelActiveTask() {
+      if (!confirm('Deseja cancelar a tarefa em execução? O que já foi processado será mantido.')) return;
+      try {
+        await fetch('/api/task-cancel', { method: 'POST' });
+        showToast('Solicitação de cancelamento enviada.', 'info');
+      } catch (e) {
+        showToast('Erro ao solicitar cancelamento', 'error');
+      }
+    }
+
+    async function triggerBatchGenerate() {
+      const count = prompt('Quantos produtos pendentes deseja gerar com IA agora?\n(Digite 0 para gerar TODOS os pendentes em segundo plano):', '20');
+      if (count === null) return;
+      const num = parseInt(count.trim() || '0');
+
+      showToast(`Iniciando geração com IA em segundo plano...`, 'info');
+      try {
+        const res = await fetch('/api/batch-generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ limit: num })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          startTaskPolling();
+        } else {
+          showToast(data.error || 'Erro ao iniciar lote', 'error');
+        }
+      } catch (e) {
+        showToast('Erro ao comunicar com o servidor', 'error');
+      }
+    }
+
+    async function triggerBatchApprove() {
+      if (!confirm('Deseja marcar TODOS os produtos pendentes como APROVADO?')) return;
+
+      showToast('Aprovando produtos...', 'info');
+      try {
+        const res = await fetch('/api/batch-approve', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          showToast(`Pronto! ${data.approved} produtos foram aprovados com sucesso.`);
+          loadStats();
+          loadProducts();
+        } else {
+          showToast('Erro ao aprovar em lote: ' + data.error, 'error');
+        }
+      } catch (e) {
+        showToast('Erro de conexão ao aprovar produtos', 'error');
+      }
+    }
+
+    async function triggerBatchPublish() {
+      if (!confirm('Deseja publicar TODOS os produtos marcados como APROVADO na Loja Integrada?')) return;
+
+      showToast('Publicação iniciada em segundo plano!', 'info');
+      try {
+        const res = await fetch('/api/batch-publish', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          startTaskPolling();
+        } else {
+          showToast(data.error || 'Erro ao iniciar publicação', 'error');
+        }
+      } catch (e) {
+        showToast('Erro ao iniciar publicação na loja', 'error');
+      }
+    }
+
+    // Modal Configurações
+    async function openSettingsModal() {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      document.getElementById('settingStoreName').value = data.store_name || '';
+      document.getElementById('settingStoreUrl').value = data.store_url || '';
+      document.getElementById('settingOpenaiModel').value = data.openai_model || 'gpt-4o-mini';
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    async function saveSettings() {
+      const payload = {
+        store_name: document.getElementById('settingStoreName').value,
+        store_url: document.getElementById('settingStoreUrl').value,
+        openai_model: document.getElementById('settingOpenaiModel').value,
+      };
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      showToast('Configurações salvas!');
+      closeSettingsModal();
+    }
+
+    // Modal Sincronização
+    function openSyncModal() {
+      document.getElementById('syncModal').classList.remove('hidden');
+    }
+    function closeSyncModal() {
+      document.getElementById('syncModal').classList.add('hidden');
+    }
+    async function executeSync() {
+      const limit = document.getElementById('syncLimit').value;
+      const onlyAvailable = document.getElementById('syncOnlyAvailable').checked;
+
+      // Fecha o modal IMEDIATAMENTE para não deixar a tela travada
+      closeSyncModal();
+      showToast('Sincronização iniciada em segundo plano! Acompanhe no topo.', 'info');
+
+      try {
+        const res = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            limit: parseInt(limit),
+            only_available: onlyAvailable
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          startTaskPolling();
+        } else {
+          showToast(data.error || 'Erro ao iniciar sincronização', 'error');
+        }
+      } catch (e) {
+        showToast('Falha ao comunicar com o servidor', 'error');
+      }
+    }
+
+    // Inicialização
+    window.onload = () => {
+      lucide.createIcons();
+      loadStats();
+      loadProducts();
+      checkTaskStatus(); // Verifica se já havia alguma tarefa rodando
+    };
+  </script>
+</body>
+
+</html>
